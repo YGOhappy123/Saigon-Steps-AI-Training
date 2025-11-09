@@ -10,21 +10,24 @@ if not dataset_path:
 
 def modify_dataset_labels(dataset_path: str, dir_name: str, exclude_classes: list):
     """
-    Modifies the label files in the specified directory by replacing the first character
+    Modifies the label files in the specified labels_directory by replacing the first character
     of each line with '0' to reduce the dataset to single-class.
     Args:
         dataset_path (str): The base path to the dataset.
         dir_name (str): The name of the subdirectory containing label files.
         exclude_classes (list): List of class indices to exclude.
     Raises:
-        FileNotFoundError: If the specified directory does not exist.
+        FileNotFoundError: If the specified directory does not contain labels folder.
     """
 
-    directory = Path(dataset_path, dir_name, "labels")
-    if not directory.exists():
-        raise FileNotFoundError(f"The directory [{directory}] is not existing.")
+    directory = Path(dataset_path, dir_name)
+    labels_directory = Path(dataset_path, dir_name, "labels")
+    if directory.exists() and not labels_directory.exists():
+        raise FileNotFoundError(
+            f"The directory [{labels_directory}] is not containing labels folder."
+        )
 
-    for file in directory.iterdir():
+    for file in labels_directory.iterdir():
         if file.is_file():
             with file.open(encoding='utf-8') as f:
                 lines = f.readlines()
@@ -42,7 +45,7 @@ def modify_dataset_labels(dataset_path: str, dir_name: str, exclude_classes: lis
 
 
 if __name__ == "__main__":
-    splitted_dirs = ['train', 'valid']
+    splitted_dirs = ['train', 'test', 'valid']
     exclude_classes = []
     for dir_name in splitted_dirs:
         modify_dataset_labels(dataset_path, dir_name, exclude_classes)
