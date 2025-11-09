@@ -64,7 +64,7 @@ Before running the project, make sure to set up the database and environment var
    In the root directory of your project (at the same level as `.env.example`), create a `.env` file.
 
 2. Add the `src/dataset` folder:
-   Provide the model with the dataset for shoe detection in YOLOv8 format with `train` subfolder, `test` subfolder, `valid` subfolder and `data.yaml` file.
+   Provide the model with the dataset for shoe detection in YOLOv8 format with `train` subfolder, `valid` subfolder, `test` subfolder (optional) and `data.yaml` file.
 
 3. Populate the environment variables:
 
