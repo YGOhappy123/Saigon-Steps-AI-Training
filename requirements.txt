@@ -5,3 +5,5 @@ numpy==1.26.4
 pandas==2.2.3
 python-dotenv==1.0.1
 transformers==4.47.1
+ultralytics==8.3.22
+weaviate-client==4.17.0

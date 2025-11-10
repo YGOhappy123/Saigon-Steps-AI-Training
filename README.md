@@ -7,7 +7,6 @@ This is the AI Models Training portion of our University Graduation project. Bui
 - [Technologies Used](#technologies-used)
 - [Required Dependencies](#required-dependencies)
 - [Installation](#installation)
-- [Before You Run](#before-you-run)
 - [Development](#development)
 - [Features](#features)
 - [Suggested VS Code Extensions](#suggested-vs-code-extensions)
@@ -54,29 +53,6 @@ Follow these steps to set up and run the application locally.
    ```
 
 **Note:** You might consider running this project on a `python virtual environment` to prevent dependencies conflicts with local environment.
-
-## Before You Run
-
-Before running the project, make sure to set up the database and environment variables:
-
-1. Create a `.env` file:
-
-   In the root directory of your project (at the same level as `.env.example`), create a `.env` file.
-
-2. Add the `src/dataset` folder:
-   Provide the model with the dataset for shoe detection in YOLOv8 format with `train` subfolder, `valid` subfolder, `test` subfolder (optional) and `data.yaml` file.
-
-3. Populate the environment variables:
-
-   Copy the variables from `.env.example` into `.env` and replace the placeholder values with your actual configuration.
-
-   **Notes:**
-
-   - You must replace `<DATASET_PATH>` with the actual path to the `src/dataset` directory on your machine.
-
-4. For collaborators:
-
-   If you are a collaborator on this project, please contact the project owner to obtain the values for the environment variables and model dataset.
 
 ## Development
 
