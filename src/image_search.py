@@ -1,7 +1,8 @@
 import base64
+from urllib import response
 import requests
 import weaviate
-from weaviate.classes.query import MetadataQuery
+from weaviate.classes.query import MetadataQuery, Filter
 from ultralytics import YOLO
 from io import BytesIO
 from PIL import Image
@@ -11,68 +12,94 @@ model = YOLO("src/model/shoe_detector.pt")
 
 def store_images(product_id, image_list):
     client = weaviate.connect_to_local()
-    collection = client.collections.get(name="ProductImage")
 
-    cropped_images = []
-    for image_url in image_list:
-        image = Image.open(BytesIO(requests.get(image_url).content))
-        result = model.predict(source=image, conf=0.4, verbose=False)
+    if client.is_ready():
+        collection = client.collections.get(name="ProductImage")
 
-        for box in result[0].boxes.xyxy:
-            x1, y1, x2, y2 = map(int, box)
-            cropped = image.crop((x1, y1, x2, y2))
+        cropped_images = []
+        for image_url in image_list:
+            image = Image.open(BytesIO(requests.get(image_url).content))
+            result = model.predict(source=image, conf=0.4, verbose=False)
 
-            buffer = BytesIO()
-            cropped.save(buffer, format="JPEG")
-            img_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
-            cropped_images.append({"image": img_base64, "productId": product_id})
+            for box in result[0].boxes.xyxy:
+                x1, y1, x2, y2 = map(int, box)
+                cropped = image.crop((x1, y1, x2, y2))
 
-    collection.data.insert_many(cropped_images)
-    client.close()
+                buffer = BytesIO()
+                cropped.save(buffer, format="JPEG")
+                img_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+                cropped_images.append({"image": img_base64, "productId": product_id})
+
+        collection.data.insert_many(cropped_images)
+        print(f"✅ Store image vectors successfully for product ID: {product_id}")
+        client.close()
+    else:
+        print("❌ Connection failed")
+        client.close()
 
 
 def image_search(image_bytes):
     client = weaviate.connect_to_local()
-    collection = client.collections.get(name="ProductImage")
 
-    query_img = Image.open(BytesIO(image_bytes))
-    result = model.predict(source=query_img, conf=0.4, verbose=False)
+    if client.is_ready():
+        collection = client.collections.get(name="ProductImage")
 
-    detections = []
-    width, height = query_img.size
-    for box in result[0].boxes.xyxy:
-        x1, y1, x2, y2 = map(int, box)
-        cropped = query_img.crop((x1, y1, x2, y2))
+        query_img = Image.open(BytesIO(image_bytes))
+        width, height = query_img.size
+        result = model.predict(source=query_img, conf=0.4, verbose=False)
 
-        buffer = BytesIO()
-        cropped.save(buffer, format="JPEG")
-        img_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+        detections = []
+        for box in result[0].boxes.xyxy:
+            x1, y1, x2, y2 = map(int, box)
+            cropped = query_img.crop((x1, y1, x2, y2))
 
-        search_result = collection.query.near_image(
-            near_image=img_base64,
-            return_properties=["productId"],
-            return_metadata=MetadataQuery(certainty=True),
-            limit=10,
-        )
+            buffer = BytesIO()
+            cropped.save(buffer, format="JPEG")
+            img_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
-        groups = {}
-        for item in search_result.objects:
-            pid = item.properties["productId"]
-            certainty = item.metadata.certainty
-            if pid not in groups or certainty > groups[pid]:
-                groups[pid] = certainty
+            search_result = collection.query.near_image(
+                near_image=img_base64,
+                return_properties=["productId"],
+                return_metadata=MetadataQuery(certainty=True),
+                limit=10,
+            )
 
-        detections.append(
-            {
-                "boundingBox": {
-                    "x1": x1 / width,
-                    "y1": y1 / height,
-                    "x2": x2 / width,
-                    "y2": y2 / height,
-                },
-                "results": sorted(groups.items(), key=lambda x: x[1], reverse=True)[:3],
-            }
-        )
+            groups = {}
+            for item in search_result.objects:
+                pid = item.properties["productId"]
+                certainty = item.metadata.certainty
+                if pid not in groups or certainty > groups[pid]:
+                    groups[pid] = certainty
 
-    client.close()
-    return detections
+            detections.append(
+                {
+                    "boundingBox": {
+                        "x1": x1 / width,
+                        "y1": y1 / height,
+                        "x2": x2 / width,
+                        "y2": y2 / height,
+                    },
+                    "results": sorted(groups.items(), key=lambda x: x[1], reverse=True)[:3],
+                }
+            )
+
+        client.close()
+        return detections
+    else:
+        print("❌ Connection failed")
+        client.close()
+
+
+def delete_images(product_id):
+    client = weaviate.connect_to_local()
+
+    if client.is_ready():
+        collection = client.collections.get(name="ProductImage")
+
+        collection.data.delete_many(where=Filter.by_property("productId").equal(product_id))
+        print(f"✅ Deleted images for product ID: {product_id}")
+
+        client.close()
+    else:
+        print("❌ Connection failed")
+        client.close()

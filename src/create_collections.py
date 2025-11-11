@@ -1,7 +1,8 @@
 import weaviate
 from weaviate.classes.config import Configure, Property, DataType
 
-if __name__ == "__main__":
+
+def recreate_collections():
     client = weaviate.connect_to_local()
 
     if client.is_ready():
@@ -30,8 +31,12 @@ if __name__ == "__main__":
             ],
         )
 
-        print("✅ Collections created successfully")
+        print("✅ Create collections successfully")
         client.close()
     else:
         print("❌ Connection failed")
         client.close()
+
+
+if __name__ == "__main__":
+    recreate_collections()

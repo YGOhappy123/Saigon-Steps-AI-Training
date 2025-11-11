@@ -19,7 +19,7 @@ services:
             AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
             PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
             CLUSTER_HOSTNAME: 'node1'
-            ENABLE_MODULES: text2vec-transformers,,img2vec-neural
+            ENABLE_MODULES: text2vec-transformers,img2vec-neural
             TRANSFORMERS_INFERENCE_API: http://text2vec:8080
             IMAGE_INFERENCE_API: http://img2vec:8080
     text2vec:
