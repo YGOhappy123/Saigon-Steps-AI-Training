@@ -100,7 +100,6 @@ Now you can access the app using other devices by visiting `http://<IPv4 Adddess
 | Prettier - Code formatter     | Prettier             |    Yes    | Code formatting                                    |
 | Black Formatter               | Microsoft            |    Yes    | Code formatting                                    |
 | Python                        | Microsoft            |    Yes    | Python runtime VS Code                             |
-| Jupiter                       | Microsoft            |    Yes    | Jupiter notebook for VS Code                       |
 | Docker DX                     | Docker               |    No     | Code formatting and autocomplete                   |
 | Code Spell Checker            | Street Side Software |    No     | Spelling checker for source code                   |
 | Multiple cursor case preserve | Cardinal90           |    No     | Preserves case when editing with multiple cursors  |

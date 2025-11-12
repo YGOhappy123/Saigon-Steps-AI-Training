@@ -1,5 +1,4 @@
 import base64
-from urllib import response
 import requests
 import weaviate
 from weaviate.classes.query import MetadataQuery, Filter
@@ -79,7 +78,7 @@ def image_search(image_bytes):
                         "x2": x2 / width,
                         "y2": y2 / height,
                     },
-                    "results": sorted(groups.items(), key=lambda x: x[1], reverse=True)[:3],
+                    "results": sorted(groups.items(), key=lambda x: x[1], reverse=True)[:5],
                 }
             )
 

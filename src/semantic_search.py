@@ -67,7 +67,6 @@ def store_description(product_id, name, price, brand, sizes, features):
 def semantic_search(query):
     client = weaviate.connect_to_local()
 
-    detections = []
     if client.is_ready():
         collection = client.collections.get(name="ProductDescription")
 
@@ -85,7 +84,7 @@ def semantic_search(query):
             if pid not in groups or certainty > groups[pid]:
                 groups[pid] = certainty
 
-        detections.append(sorted(groups.items(), key=lambda x: x[1], reverse=True))
+        detections = sorted(groups.items(), key=lambda x: x[1], reverse=True)[:5]
 
         client.close()
         return detections
