@@ -1,6 +1,6 @@
 # Saigon Steps - AI Training
 
-This is the AI Models Training portion of our University Graduation project. Built with Flask, YOLOv8, Gemini and Weaviate.
+This is the AI Models Training portion of our University Graduation project. Built with Flask, YOLOv8 and Weaviate.
 
 ## Table of Contents
 
@@ -17,9 +17,6 @@ This is the AI Models Training portion of our University Graduation project. Bui
 - [Flask](https://flask.palletsprojects.com/en/stable/)
 - [YOLOv8](https://docs.ultralytics.com/models/yolov8/)
 - [Weaviate](https://weaviate.io/)
-- [Gemini](https://aistudio.google.com/)
-- [NumPy](https://numpy.org/)
-- [Pandas](https://pandas.pydata.org/)
 - [Matplotlib](https://matplotlib.org/)
 
 ## Required Dependencies
@@ -62,7 +59,7 @@ To start the development server, use:
 python src/flask_server.py
 ```
 
-This will start the ExpressJS server
+This will start the Flask server
 
 You can view the app by visiting `http://localhost:8000` in your browser.
 
