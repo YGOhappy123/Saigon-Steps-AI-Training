@@ -59,6 +59,12 @@ To start the development server, use:
 python src/flask_server.py
 ```
 
+**Note:** You have to have the `Docker containers` running first. Either using `Docker Desktop` or using the following command in a separate terminal
+
+```bash
+docker compose up -d
+```
+
 This will start the Flask server
 
 You can view the app by visiting `http://localhost:8000` in your browser.

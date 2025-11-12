@@ -78,7 +78,7 @@ def image_search(image_bytes):
                         "x2": x2 / width,
                         "y2": y2 / height,
                     },
-                    "results": sorted(groups.items(), key=lambda x: x[1], reverse=True)[:5],
+                    "products": sorted(groups.items(), key=lambda x: x[1], reverse=True)[:5],
                 }
             )
 
