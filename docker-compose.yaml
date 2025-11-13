@@ -19,13 +19,9 @@ services:
             AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
             PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
             CLUSTER_HOSTNAME: 'node1'
-            ENABLE_MODULES: text2vec-transformers,img2vec-neural
-            TRANSFORMERS_INFERENCE_API: http://text2vec:8080
+            ENABLE_MODULES: text2vec-google,img2vec-neural
             IMAGE_INFERENCE_API: http://img2vec:8080
-    text2vec:
-        image: semitechnologies/transformers-inference:sentence-transformers-multi-qa-MiniLM-L6-cos-v1
-        environment:
-            ENABLE_CUDA: 0
+            GOOGLE_APIKEY: ${GOOGLE_GEMINI_APIKEY}
     img2vec:
         image: semitechnologies/img2vec-pytorch:resnet50
         restart: always

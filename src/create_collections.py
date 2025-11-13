@@ -22,9 +22,13 @@ def recreate_collections():
         client.collections.create(
             name="ProductDescription",
             description="Text descriptions for semantic search",
-            vector_config=Configure.Vectors.text2vec_transformers(
-                name="description_vector", source_properties=["description"]
-            ),
+            vector_config=[
+                Configure.Vectors.text2vec_google_aistudio(
+                    name="description_vector",
+                    source_properties=["description"],
+                    model="gemini-embedding-001",
+                )
+            ],
             properties=[
                 Property(name="description", data_type=DataType.TEXT),
                 Property(name="productId", data_type=DataType.INT),
