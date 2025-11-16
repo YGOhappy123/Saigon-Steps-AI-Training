@@ -1,9 +1,11 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from create_collections import recreate_collections
 from image_search import image_search, store_images, delete_images
 from semantic_search import semantic_search, store_description, delete_description
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/', methods=['GET'])
