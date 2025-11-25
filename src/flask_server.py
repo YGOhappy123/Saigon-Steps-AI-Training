@@ -56,7 +56,7 @@ def update_product_controller(product_id):
         store_images(product_id, image_list)
         store_description(product_id, name, price, brand, sizes, features)
 
-        return jsonify({'message': 'Product added successfully'}), 201
+        return jsonify({'message': 'Product updated successfully'}), 200
     else:
         return jsonify({'message': 'Request must be JSON'}), 422
 
@@ -66,7 +66,7 @@ def delete_product_controller(product_id):
     delete_images(product_id)
     delete_description(product_id)
 
-    return jsonify({'message': 'Product deleted successfully'}), 201
+    return jsonify({'message': 'Product deleted successfully'}), 200
 
 
 @app.route('/image-search', methods=['POST'])

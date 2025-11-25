@@ -9,6 +9,20 @@ from PIL import Image
 model = YOLO("src/model/shoe_detector.pt")
 
 
+def ensure_rgb(image):
+    """
+    Convert an image to RGB if it has an alpha channel or palette.
+    Transparent areas will be filled with white.
+    """
+
+    if image.mode in ("RGBA", "LA") or (image.mode == "P" and "transparency" in image.info):
+        background = Image.new("RGB", image.size, (255, 255, 255))
+        background.paste(image, mask=image.split()[-1])
+        return background
+
+    return image.convert("RGB")
+
+
 def store_images(product_id, image_list):
     client = weaviate.connect_to_local()
 
@@ -23,6 +37,7 @@ def store_images(product_id, image_list):
             for box in result[0].boxes.xyxy:
                 x1, y1, x2, y2 = map(int, box)
                 cropped = image.crop((x1, y1, x2, y2))
+                cropped = ensure_rgb(cropped)
 
                 buffer = BytesIO()
                 cropped.save(buffer, format="JPEG")
@@ -51,6 +66,7 @@ def image_search(image_bytes):
         for box in result[0].boxes.xyxy:
             x1, y1, x2, y2 = map(int, box)
             cropped = query_img.crop((x1, y1, x2, y2))
+            cropped = ensure_rgb(cropped)
 
             buffer = BytesIO()
             cropped.save(buffer, format="JPEG")

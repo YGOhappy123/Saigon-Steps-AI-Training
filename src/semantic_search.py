@@ -83,7 +83,7 @@ def semantic_search(query):
             if pid not in groups or certainty > groups[pid]:
                 groups[pid] = certainty
 
-        detections = sorted(groups.items(), key=lambda x: x[1], reverse=True)[:6]
+        detections = sorted(groups.items(), key=lambda x: x[1], reverse=True)[:8]
 
         client.close()
         return detections
