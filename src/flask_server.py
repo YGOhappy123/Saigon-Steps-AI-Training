@@ -3,6 +3,7 @@ from flask_cors import CORS
 from create_collections import recreate_collections
 from image_search import image_search, store_images, delete_images
 from semantic_search import semantic_search, store_description, delete_description
+from similar_search import get_similar_products
 
 app = Flask(__name__)
 CORS(app)
@@ -91,6 +92,13 @@ def semantic_search_controller():
         return jsonify({'data': {"detections": detections}}), 200
     else:
         return jsonify({'message': 'Request must be JSON'}), 422
+
+
+@app.route('/similar-products/<int:product_id>', methods=['GET'])
+def get_similar_products_controller(product_id):
+    detections = get_similar_products(product_id)
+
+    return jsonify({'data': {"detections": detections}}), 200
 
 
 if __name__ == '__main__':

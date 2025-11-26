@@ -69,11 +69,12 @@ def semantic_search(query):
     if client.is_ready():
         collection = client.collections.get(name="ProductDescription")
 
+        limit = 8
         search_result = collection.query.near_text(
             query=query,
             return_properties=["productId"],
             return_metadata=MetadataQuery(certainty=True),
-            limit=8,
+            limit=limit,
         )
 
         groups = {}
@@ -83,7 +84,7 @@ def semantic_search(query):
             if pid not in groups or certainty > groups[pid]:
                 groups[pid] = certainty
 
-        detections = sorted(groups.items(), key=lambda x: x[1], reverse=True)[:8]
+        detections = sorted(groups.items(), key=lambda x: x[1], reverse=True)[:limit]
 
         client.close()
         return detections

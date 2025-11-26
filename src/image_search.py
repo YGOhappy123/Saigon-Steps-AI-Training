@@ -72,11 +72,13 @@ def image_search(image_bytes):
             cropped.save(buffer, format="JPEG")
             img_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
+            search_limit = 10
+            group_limit = 4
             search_result = collection.query.near_image(
                 near_image=img_base64,
                 return_properties=["productId"],
                 return_metadata=MetadataQuery(certainty=True),
-                limit=10,
+                limit=search_limit,
             )
 
             groups = {}
@@ -94,7 +96,9 @@ def image_search(image_bytes):
                         "x2": x2 / width,
                         "y2": y2 / height,
                     },
-                    "products": sorted(groups.items(), key=lambda x: x[1], reverse=True)[:4],
+                    "products": sorted(groups.items(), key=lambda x: x[1], reverse=True)[
+                        :group_limit
+                    ],
                 }
             )
 
