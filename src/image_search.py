@@ -1,12 +1,15 @@
-import base64
 import requests
 import weaviate
+import numpy as np
+from fashion_clip.fashion_clip import FashionCLIP
 from weaviate.classes.query import MetadataQuery, Filter
+from weaviate.classes.data import DataObject
 from ultralytics import YOLO
 from io import BytesIO
 from PIL import Image
 
-model = YOLO("src/model/shoe_detector.pt")
+fclip_model = FashionCLIP("fashion-clip")
+yolo_model = YOLO("src/model/shoe_detector.pt")
 
 
 def ensure_rgb(image):
@@ -23,28 +26,36 @@ def ensure_rgb(image):
     return image.convert("RGB")
 
 
+def encode_image(image: Image.Image) -> list[float]:
+    image = ensure_rgb(image)
+
+    embedding = fclip_model.encode_images(images=[image], batch_size=1)[0]
+    embedding = embedding / np.linalg.norm(embedding)
+
+    return embedding.tolist()
+
+
 def store_images(product_id, image_list):
     client = weaviate.connect_to_local()
 
     if client.is_ready():
         collection = client.collections.get(name="ProductImage")
 
-        cropped_images = []
+        objects = []
         for image_url in image_list:
             image = Image.open(BytesIO(requests.get(image_url).content))
-            result = model.predict(source=image, conf=0.4, verbose=False)
+            result = yolo_model.predict(source=image, conf=0.4, verbose=False)
 
             for box in result[0].boxes.xyxy:
                 x1, y1, x2, y2 = map(int, box)
                 cropped = image.crop((x1, y1, x2, y2))
-                cropped = ensure_rgb(cropped)
 
-                buffer = BytesIO()
-                cropped.save(buffer, format="JPEG")
-                img_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
-                cropped_images.append({"image": img_base64, "productId": product_id})
+                embedding = encode_image(cropped)
+                objects.append(DataObject(properties={"productId": product_id}, vector=embedding))
 
-        collection.data.insert_many(cropped_images)
+        if len(objects) > 0:
+            collection.data.insert_many(objects)
+
         print(f"✅ Store image vectors successfully for product ID: {product_id}")
         client.close()
     else:
@@ -60,22 +71,18 @@ def image_search(image_bytes):
 
         query_img = Image.open(BytesIO(image_bytes))
         width, height = query_img.size
-        result = model.predict(source=query_img, conf=0.4, verbose=False)
+        result = yolo_model.predict(source=query_img, conf=0.4, verbose=False)
 
         detections = []
         for box in result[0].boxes.xyxy:
             x1, y1, x2, y2 = map(int, box)
             cropped = query_img.crop((x1, y1, x2, y2))
-            cropped = ensure_rgb(cropped)
-
-            buffer = BytesIO()
-            cropped.save(buffer, format="JPEG")
-            img_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+            embedding = encode_image(cropped)
 
             search_limit = 10
             group_limit = 4
-            search_result = collection.query.near_image(
-                near_image=img_base64,
+            search_result = collection.query.near_vector(
+                near_vector=embedding,
                 return_properties=["productId"],
                 return_metadata=MetadataQuery(certainty=True),
                 limit=search_limit,

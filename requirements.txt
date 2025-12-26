@@ -6,3 +6,4 @@ pillow==12.0.0
 python-dotenv==1.0.1
 ultralytics==8.3.22
 weaviate-client==4.17.0
+fashion_clip==0.2.2

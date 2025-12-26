@@ -12,20 +12,14 @@ services:
             - 8080:8080
             - 50051:50051
         volumes:
-            - weaviate_data:/var/lib/weaviate
+            - weaviate_data_clip:/var/lib/weaviate
         restart: on-failure:0
         environment:
             QUERY_DEFAULTS_LIMIT: 25
             AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
             PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
             CLUSTER_HOSTNAME: 'node1'
-            ENABLE_MODULES: text2vec-google,img2vec-neural
-            IMAGE_INFERENCE_API: http://img2vec:8080
+            ENABLE_MODULES: text2vec-google
             GOOGLE_APIKEY: ${GOOGLE_GEMINI_APIKEY}
-    img2vec:
-        image: semitechnologies/img2vec-pytorch:resnet50
-        restart: always
-        environment:
-            ENABLE_CUDA: '0'
 volumes:
-    weaviate_data:
+    weaviate_data_clip:

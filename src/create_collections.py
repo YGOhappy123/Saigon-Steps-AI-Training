@@ -11,17 +11,12 @@ def recreate_collections():
         client.collections.create(
             name="ProductImage",
             description="Product image embeddings for image-based search",
-            vector_config=Configure.Vectors.img2vec_neural(
-                name="image_vector", image_fields=["image"]
-            ),
-            properties=[
-                Property(name="image", data_type=DataType.BLOB),
-                Property(name="productId", data_type=DataType.INT),
-            ],
+            vector_config=Configure.Vectors.self_provided(),
+            properties=[Property(name="productId", data_type=DataType.INT)],
         )
         client.collections.create(
             name="ProductDescription",
-            description="Text descriptions for semantic search",
+            description="Product description embeddings for semantic search",
             vector_config=Configure.Vectors.text2vec_google_aistudio(
                 name="description_vector",
                 source_properties=["description"],
